@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Gilbert Photo Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,800&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{--bg:#f3f4f6;--panel:#fff;--ink:#1b1e27;--muted:#5d6372;--line:#dfe2e8;--accent:#a65f00;--ok:#1f7a4a;--ok-bg:#e3f3ea;--warn:#9a3c1c;
+--display:"Archivo",system-ui,sans-serif;--body:"Atkinson Hyperlegible",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#111318;--panel:#1a1d24;--ink:#eceef2;--muted:#a2a8b5;--line:#2c303a;--accent:#f2aa45;--ok:#78d1a0;--ok-bg:#183326;--warn:#f19a7c;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--body)}
+.wrap{max-width:1100px;margin:0 auto;padding:24px max(16px,env(safe-area-inset-left)) 80px;display:flex;flex-direction:column;gap:18px}
+h1{font:800 clamp(28px,6vw,48px)/1 var(--display);font-stretch:72%;margin:0;text-transform:uppercase}
+h2{font:800 19px var(--display);font-stretch:80%;margin:0;text-transform:uppercase}
+.eyebrow{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.muted{color:var(--muted)} p{margin:0;max-width:70ch}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.gate{max-width:440px;margin:12vh auto 0}
+input[type=text],input[type=password],textarea,select{font:16px var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;width:100%}
+label{display:flex;flex-direction:column;gap:4px;font-weight:700;font-size:14px}
+label small{font-weight:400;color:var(--muted)}
+.btn{font:700 15px var(--body);padding:10px 18px;border-radius:6px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.err{color:var(--warn);font-size:14px}
+.rail{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 0;display:flex;flex-wrap:wrap;gap:12px;align-items:center;border-bottom:1px solid var(--line)}
+.bar{flex:1 1 200px;height:8px;background:var(--line);border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.count{font:500 14px var(--mono)}
+.filters{display:flex;gap:6px}.filters button{font:700 13px var(--body);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+.filters button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+.card.done{border-color:var(--ok)}
+@media (max-width:820px){.card{grid-template-columns:1fr}}
+.pic{background:#000;display:flex;align-items:center;justify-content:center;min-height:240px}
+.fw{position:relative;display:inline-block;line-height:0;max-width:100%}
+.fw img{max-width:100%;max-height:560px;display:block}
+.fw.on{cursor:crosshair;outline:3px solid var(--accent)}
+.ph{color:#999;font:14px var(--mono);padding:40px}
+.dot{position:absolute;transform:translate(-50%,-50%);min-width:26px;height:26px;border-radius:13px;background:var(--accent);color:#111;border:2px solid #fff;font:700 13px/22px var(--mono);text-align:center;pointer-events:none}
+.side{padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.top{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.cue{font:800 22px var(--display);color:var(--accent)}
+.chip{font:500 12px var(--mono);padding:2px 8px;border-radius:4px;background:var(--bg);color:var(--muted)}.chip.ok{background:var(--ok-bg);color:var(--ok)}
+.guess{font-size:14px;color:var(--muted);border-left:3px solid var(--line);padding-left:10px}
+.names{display:flex;flex-wrap:wrap;gap:5px}.names button{font:13px var(--body);padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.faces{border:1px dashed var(--line);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.row input{flex:1 1 160px}
+.x{font:700 13px var(--body);border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:6px;padding:5px 10px;cursor:pointer}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.status{font:13px var(--mono);color:var(--muted)}.status.ok{color:var(--ok)}.status.err{color:var(--warn)}
+details summary{cursor:pointer;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <form class="box gate" id="gate" autocomplete="on">
+    <div class="eyebrow">Stage Manager · Photo Trainer</div>
+    <h1>Gilbert Photo Trainer</h1>
+    <p class="muted">Private family and company photos. Enter the family phrase to start.</p>
+    <label>Your name <small>so we know who tagged what</small>
+      <input type="text" id="who" name="username" autocomplete="username" required placeholder="e.g. Taryn">
+    </label>
+    <label>Family phrase
+      <input type="password" id="phrase" name="password" autocomplete="current-password" required>
+    </label>
+    <button class="btn" type="submit" id="go">Start tagging</button>
+    <div class="err" id="gerr" role="alert"></div>
+  </form>
+</div>
+
+<template id="main">
+  <header style="display:flex;flex-direction:column;gap:8px">
+    <div class="eyebrow" id="eyebrow">Stage Manager · Photo Trainer</div>
+    <h1>Photo Trainer</h1>
+  </header>
+  <details class="box">
+    <summary>How to help (read once)</summary>
+    <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px">
+      <li>Look at the photo. The AI's guess is in grey and may be wrong.</li>
+      <li>Fill in <b>only what you actually know</b>: who's in it, the occasion, the show or event, where.</li>
+      <li>Several people? Press <b>Tag faces</b>, tap the middle of each face you're sure of, and type the name. That teaches the AI their face.</li>
+      <li>Press <b>Save</b>. Empty boxes are never saved, so never guess to fill one.</li>
+      <li>Don't know anything about it? Press <b>Don't know</b>. If the AI's whole guess is right, press <b>AI is right</b>.</li>
+    </ol>
+    <p class="muted">Please don't download or share these photos. Your answers teach the nightly tagger, and a new round appears here after each night's run.</p>
+  </details>
+  <div class="rail">
+    <span class="count" id="count">Loading…</span>
+    <div class="bar"><i id="fill"></i></div>
+    <div class="filters" role="group" aria-label="Show">
+      <button type="button" data-f="todo" aria-pressed="true">To tag</button>
+      <button type="button" data-f="done" aria-pressed="false">Done</button>
+      <button type="button" data-f="all" aria-pressed="false">All</button>
+    </div>
+    <button type="button" class="x" id="out">Sign out</button>
+  </div>
+  <datalist id="nm"></datalist>
+  <div id="list" style="display:flex;flex-direction:column;gap:18px"></div>
+</template>
+
+<script>
+const API = "https://n8n-zpve.srv1577689.hstgr.cloud/webhook/trainer";
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const USES = [["marketing-tier1","Top marketing: best of the best, ready as is"],["marketing","Marketing: usable with a little work"],["archive","Show archive: kept as a record, not posted"],["personal","Personal / family: private, never public"]];
+const FIELDS = ["people","faces","occasion","show","place","use","note"];
+let S = null, items = [], names = [], round = "", filter = "todo", faces = {}, faceOn = new Set(), touched = {}, thumbs = {};
+
+async function call(action, extra = {}) {
+  const r = await fetch(API, {method: "POST", headers: {"Content-Type": "text/plain"}, body: JSON.stringify({action, phrase: S.phrase, who: S.who, ...extra})});
+  if (r.status === 401 || r.status === 403) throw Object.assign(new Error("phrase"), {auth: true});
+  if (!r.ok) throw new Error("server " + r.status);
+  const j = await r.json();
+  if (j && j.ok === false && j.error === "phrase") throw Object.assign(new Error("phrase"), {auth: true});
+  return j;
+}
+
+$("#gate").addEventListener("submit", async e => {
+  e.preventDefault();
+  const who = $("#who").value.trim(), phrase = $("#phrase").value;
+  $("#go").disabled = true; $("#gerr").textContent = "";
+  S = {who, phrase};
+  try {
+    const j = await call("login");
+    if (!j.ok) throw Object.assign(new Error("phrase"), {auth: true});
+    try { sessionStorage.setItem("trainer", JSON.stringify(S)); } catch {}
+    start(j);
+  } catch (err) {
+    S = null;
+    $("#gerr").textContent = err.auth ? "That phrase isn't right. Check with Jewel." : "Couldn't reach the server. Try again in a minute.";
+  } finally { $("#go").disabled = false; }
+});
+
+function start(j) {
+  $("#app").innerHTML = ""; $("#app").append($("#main").content.cloneNode(true));
+  names = j.people || []; $("#nm").innerHTML = names.map(n => `<option value="${esc(n)}">`).join("");
+  $("#out").onclick = () => { try { sessionStorage.removeItem("trainer"); } catch {} location.reload(); };
+  load();
+}
+
+async function load() {
+  try {
+    const j = await call("round");
+    round = j.round || ""; items = j.items || [];
+    $("#eyebrow").textContent = `Stage Manager · ${round ? "Round " + round : "Photo Trainer"} · signed in as ${S.who}`;
+    render();
+  } catch (err) {
+    if (err.auth) { try { sessionStorage.removeItem("trainer"); } catch {} location.reload(); return; }
+    $("#count").textContent = "Couldn't load photos. Refresh to try again.";
+  }
+}
+
+const mine = p => (p.answers || {})[S.who.toLowerCase()];
+const facesOf = p => faces[p.id] ??= ((mine(p) || {}).faces || []).map(f => ({...f}));
+
+function cardHTML(p, i) {
+  const a = mine(p) || {}, g = p.guess || {}, v = k => esc(a[k] || "");
+  const t = thumbs[p.id];
+  return `<article class="card${a.verdict ? " done" : ""}" id="c-${esc(p.id)}" data-id="${esc(p.id)}">
+  <div class="pic">${t ? `<div class="fw${faceOn.has(p.id) ? " on" : ""}" data-fw><img src="${t}" alt="Photo ${i + 1}">${facesOf(p).map((f, n) => `<span class="dot" style="left:${f.x * 100}%;top:${f.y * 100}%">${n + 1}</span>`).join("")}</div>` : `<div class="ph" data-ph>Loading preview…</div>`}</div>
+  <div class="side">
+    <div class="top"><span class="cue">${String(i + 1).padStart(2, "0")}</span>${p.date ? `<span class="chip">${esc(p.date)}</span>` : ""}${a.verdict ? `<span class="chip ok">${a.verdict === "skip" ? "skipped" : "saved"}</span>` : ""}</div>
+    <div class="guess">AI guess: ${esc(p.summary || "")}${g.people ? `<br><b>People:</b> ${esc(g.people)}` : ""}${g.faces ? `<br><b>Faces it thinks:</b> ${esc(g.faces)}` : ""}${g.show && g.show !== "unknown" ? `<br><b>Show:</b> ${esc(g.show)}` : ""}</div>
+    <label>Who's in it <small>full names, left to right if you can</small><input type="text" data-k="people" value="${v("people")}" placeholder="leave blank if you don't know"></label>
+    <div class="names">${names.slice(0, 16).map(n => `<button type="button" data-add="${esc(n)}">+ ${esc(n)}</button>`).join("")}</div>
+    <div class="faces">
+      <div class="row"><b>Faces</b><small class="muted">teaches the AI each face</small><button type="button" class="x" data-act="faces">${faceOn.has(p.id) ? "Done tapping" : "Tag faces"}</button></div>
+      ${faceOn.has(p.id) ? `<small class="muted">Tap the middle of a face you're sure of, then type the name.</small>` : ""}
+      ${facesOf(p).map((f, n) => `<div class="row"><span class="chip">${n + 1}</span><input type="text" list="nm" data-face="${n}" value="${esc(f.name || "")}" placeholder="full name"><button type="button" class="x" data-unface="${n}" aria-label="Remove face ${n + 1}">✕</button></div>`).join("")}
+    </div>
+    <label>Occasion <small>whose birthday, which trip…</small><input type="text" data-k="occasion" value="${v("occasion")}"></label>
+    <label>Show or event<input type="text" data-k="show" value="${v("show")}" placeholder="e.g. The Wiz 2012"></label>
+    <label>Use<select data-k="use"><option value="">(not checked)</option>${USES.map(([k, l]) => `<option value="${k}"${a.use === k ? " selected" : ""}>${esc(l)}</option>`).join("")}</select></label>
+    <label>Where <small>optional</small><input type="text" data-k="place" value="${v("place")}"></label>
+    <label>Anything else <small>optional</small><textarea data-k="note">${v("note")}</textarea></label>
+    <div class="actions">
+      <button type="button" class="btn" data-act="save">Save</button>
+      <button type="button" class="btn ghost" data-act="right">AI is right</button>
+      <button type="button" class="btn ghost" data-act="skip">Don't know</button>
+      <span class="status" role="status"></span>
+    </div>
+  </div></article>`;
+}
+
+let io;
+function render() {
+  const L = $("#list"); L.innerHTML = items.length ? items.map(cardHTML).join("") : `<div class="box"><p class="muted">No photos waiting right now. A new round appears after tonight's run.</p></div>`;
+  io?.disconnect();
+  io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { io.unobserve(e.target); thumb(e.target.dataset.id); } }), {rootMargin: "600px"});
+  L.querySelectorAll(".card").forEach(c => { if (!thumbs[c.dataset.id]) io.observe(c); });
+  applyFilter(); counts();
+}
+const queue = new Set(); let busy = 0;
+function thumb(id) { queue.add(id); pump(); }
+async function pump() {
+  while (busy < 3 && queue.size) {
+    const batch = [...queue].slice(0, 4); batch.forEach(i => queue.delete(i)); busy++;
+    call("thumbs", {ids: batch}).then(j => {
+      for (const [id, b64] of Object.entries(j.thumbs || {})) { thumbs[id] = "data:image/jpeg;base64," + b64; redraw(id); }
+      batch.filter(id => !thumbs[id]).forEach(id => { const ph = document.querySelector(`#c-${CSS.escape(id)} [data-ph]`); if (ph) ph.textContent = "No preview for this one"; });
+    }).catch(() => {}).finally(() => { busy--; pump(); });
+  }
+}
+function redraw(id) {
+  const old = document.getElementById("c-" + id), i = items.findIndex(x => x.id === id); if (!old || i < 0) return;
+  const vals = {}; old.querySelectorAll("[data-k]").forEach(el => vals[el.dataset.k] = el.value);
+  const t = document.createElement("div"); t.innerHTML = cardHTML(items[i], i); const nw = t.firstElementChild;
+  nw.querySelectorAll("[data-k]").forEach(el => { if (el.dataset.k in vals) el.value = vals[el.dataset.k]; });
+  nw.hidden = old.hidden; old.replaceWith(nw);
+}
+function applyFilter() { document.querySelectorAll(".card").forEach(c => { const d = !!(mine(items.find(x => x.id === c.dataset.id)) || {}).verdict; c.hidden = filter === "todo" ? d : filter === "done" ? !d : false; }); }
+function counts() { const n = items.length, d = items.filter(p => (mine(p) || {}).verdict).length; $("#count").textContent = `${d} of ${n} tagged by you`; $("#fill").style.width = n ? 100 * d / n + "%" : 0; }
+const touch = (id, k) => (touched[id] ??= new Set()).add(k);
+
+document.addEventListener("input", e => { const c = e.target.closest(".card"); if (!c) return; const p = items.find(x => x.id === c.dataset.id);
+  if (e.target.dataset.face !== undefined) { facesOf(p)[+e.target.dataset.face].name = e.target.value; touch(p.id, "faces"); } else if (e.target.dataset.k) touch(p.id, e.target.dataset.k); });
+document.addEventListener("change", e => { const c = e.target.closest(".card"); if (c && e.target.tagName === "SELECT") touch(c.dataset.id, e.target.dataset.k); });
+document.addEventListener("click", async e => {
+  const f = e.target.closest("[data-f]"); if (f) { filter = f.dataset.f; document.querySelectorAll("[data-f]").forEach(b => b.setAttribute("aria-pressed", b === f)); applyFilter(); return; }
+  const card = e.target.closest(".card"); if (!card) return; const id = card.dataset.id, p = items.find(x => x.id === id);
+  const add = e.target.closest("[data-add]");
+  if (add) { const inp = card.querySelector('[data-k="people"]'), cur = inp.value.split(",").map(s => s.trim()).filter(Boolean); if (!cur.includes(add.dataset.add)) cur.push(add.dataset.add); inp.value = cur.join(", "); touch(id, "people"); return; }
+  const fw = e.target.closest("[data-fw]");
+  if (fw && faceOn.has(id)) { const r = fw.querySelector("img").getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    if (x < 0 || x > 1 || y < 0 || y > 1) return; facesOf(p).push({x: +x.toFixed(3), y: +y.toFixed(3), name: ""}); touch(id, "faces"); redraw(id);
+    const ins = document.querySelectorAll(`#c-${CSS.escape(id)} [data-face]`); ins[ins.length - 1]?.focus(); return; }
+  const un = e.target.closest("[data-unface]"); if (un) { facesOf(p).splice(+un.dataset.unface, 1); touch(id, "faces"); redraw(id); return; }
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  if (b.dataset.act === "faces") { faceOn.has(id) ? faceOn.delete(id) : faceOn.add(id); redraw(id); return; }
+  const st = card.querySelector(".status"), ans = {id, name: p.name, path: p.path, round, at: new Date().toISOString()};
+  if (b.dataset.act === "save") {
+    const named = facesOf(p).filter(f => f.name && f.name.trim()).map(f => ({x: f.x, y: f.y, name: f.name.trim()}));
+    const t = [...(touched[id] || [])].filter(k => k === "faces" ? named.length : card.querySelector(`[data-k="${k}"]`)?.value.trim());
+    if (!t.length) { st.textContent = "Type in at least one box first, or press Don't know."; st.className = "status err"; return; }
+    t.forEach(k => ans[k] = k === "faces" ? named : card.querySelector(`[data-k="${k}"]`).value.trim());
+    ans.verdict = "answered"; ans.answered = t; ans.not_checked = FIELDS.filter(k => !t.includes(k));
+  } else if (b.dataset.act === "right") { ans.verdict = "ai_right"; ans.confirmed = p.guess || {}; ans.answered = ["confirmed AI guess"]; ans.not_checked = []; }
+  else { ans.verdict = "skip"; ans.answered = []; ans.not_checked = FIELDS; }
+  card.querySelectorAll("button").forEach(x => x.disabled = true); st.textContent = "Saving…"; st.className = "status";
+  try { const j = await call("save", {answer: ans}); if (!j.ok) throw new Error();
+    (p.answers ??= {})[S.who.toLowerCase()] = ans; delete touched[id]; redraw(id); counts();
+    const s2 = document.querySelector(`#c-${CSS.escape(id)} .status`); if (s2) { s2.textContent = "Saved. Thank you!"; s2.className = "status ok"; }
+  } catch (err) { st.textContent = err.auth ? "Signed out. Refresh and enter the phrase again." : "Didn't save. Try again."; st.className = "status err"; card.querySelectorAll("button").forEach(x => x.disabled = false); }
+});
+
+(async () => { let s = null; try { s = JSON.parse(sessionStorage.getItem("trainer") || "null"); } catch {}
+  if (s && s.phrase) { S = s; try { const j = await call("login"); if (j.ok) return start(j); } catch {} S = null; }
+  try { $("#who").value = localStorage.getItem("trainer_who") || ""; } catch {}
+  $("#who").addEventListener("change", () => { try { localStorage.setItem("trainer_who", $("#who").value.trim()); } catch {} });
+})();
+</script>
+</body>
+</html>
